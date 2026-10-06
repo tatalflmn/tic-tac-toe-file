@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+
+<body>
+    <div id="app">
+        <div
+            class="flex justify-center h-screen items-center bg-[url('https://i.pinimg.com/736x/78/d2/0b/78d20b7b3e769e519578ed4c005c7206.jpg')] bg-center bg-cover">
+
+            <div class="flex-col">
+
+                <h1 v-if="message" class="text-3xl font-semibold text-center mb-4 text-black  font-mono">
+                    {{message}}</h1>
+
+                <div class="grid grid-cols-3 rounded-2xl bg-gray-200 p-2">
+
+                    <div v-for="(row, rowIndex) in boardCells" :key="rowIndex">
+
+                        <div v-for="(cell, colIndex) in row" :key="colIndex"
+                            class="flex justify-center items-center text-7xl font-semibold w-30 h-30 m-2 rounded-lg bg-red-800 hover:bg-red-300 cursor-pointer duration-100"
+                            @click="cellClick(rowIndex, colIndex)" :class="{'text-amber-500' :cell === 'X'
+                                , 'text-blue-500' : cell=== 'O',
+                                    'cursor-not-allowed' :cell !== '' || winner }">
+
+
+                            {{cell}}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end mt-5">
+
+                    <button @click="restartGame"
+                        class="bg-gray-100 px-5 py-2 rounded-lg font-semibold hover:bg-red-500 hover:text-white cursor-pointer mb-5">Restart
+                        Game</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        Vue.createApp({
+            data() {
+                return {
+                    boardCells: [
+                        ["", "", "",],
+                        ["", "", "",],
+                        ["", "", "",]
+                    ],
+                    message: "Let's Start!",
+                    currentPlayer: 'X',
+                    winner: null,
+                }
+            }, methods: {
+                cellClick(row, col) {
+                    if (this.boardCells[row][col] !== "" || this.winner) {
+                        return;
+                    }
+                    this.boardCells[row][col] = this.currentPlayer;
+
+                    if (this.isWinner(this.currentPlayer)) {
+                        this.winner = this.currentPlayer;
+                        this.message = `Player ${this.winner} win!`;
+                    }
+                    else if (this.isDraw(this.currentPlayer)){
+                        this.message =  `Draw!`;
+                    }
+                    else {
+                        this.currentPlayer = this.currentPlayer === 'X' ? 'O' : 'X';
+                        this.message = `Player ${this.currentPlayer}'s Turn`
+
+                    }
+                },
+                
+                isDraw() {
+                    for (let row = 0; row <3; row++) {
+                        for (let col = 0; col < 3; col++) {
+                            if (this.boardCells[row][col] === '') {
+                                return false;
+                            }
+                        }
+                    }
+                    return true;
+                },
+
+                isWinner(user) {
+                    // row
+                    for (let row = 0; row < this.boardCells.length; row++) {
+                        if (this.boardCells[row][0] == user
+                            && this.boardCells[row][1] == user
+                            && this.boardCells[row][2] == user) {
+                            return true;
+                        }
+                    }
+                    // col
+                    for (let col = 0; col < this.boardCells.length; col++) {
+                        if (this.boardCells[0][col] == user
+                            && this.boardCells[1][col] == user
+                            && this.boardCells[2][col] == user) {
+                            return true;
+                        }
+                    }
+                    // diagonal
+                    if (this.boardCells[0][0] == user
+                        && this.boardCells[1][1] == user
+                        && this.boardCells[2][2] == user) {
+                        return true;
+                    }
+
+                    if (this.boardCells[0][2] == user
+                        && this.boardCells[1][1] == user
+                        && this.boardCells[2][0] == user) {
+                        return true;
+                    }
+                    return false;
+
+                },
+                restartGame() {
+                    this.boardCells = [
+                        ["", "", "",],
+                        ["", "", "",],
+                        ["", "", "",]
+                    ];
+
+                    this.currentPlayer = 'X',
+                        this.winner = null;
+                    this.message = "Let's Start Again!";
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+
+</html>
